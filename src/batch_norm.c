@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
+#define EPSILON 0.001
 
 matrix mean(matrix x, int spatial)
 {
@@ -23,6 +24,15 @@ matrix variance(matrix x, matrix m, int spatial)
 {
     matrix v = make_matrix(1, x.cols/spatial);
     // TODO: 7.1 - calculate variance
+    int i, j;
+    for(i = 0; i < x.rows; ++i){
+        for(j = 0; j < x.cols; ++j){
+            v.data[j/spatial] += pow((x.data[i*x.cols + j] - m.data[j/spatial]), 2.0);
+        }
+    }
+    for(i = 0; i < m.cols; ++i){
+        v.data[i] = v.data[i] / x.rows / spatial;
+    }
     return v;
 }
 
@@ -30,6 +40,15 @@ matrix normalize(matrix x, matrix m, matrix v, int spatial)
 {
     matrix norm = make_matrix(x.rows, x.cols);
     // TODO: 7.2 - normalize array, norm = (x - mean) / sqrt(variance + eps)
+    for (int i = 0; i < x.rows; i++) {
+        for (int j = 0; j < x.cols; j++) {
+            float variance = v.data[j/spatial];
+            float mean = m.data[j / spatial];
+            float val = x.data[i * x.cols + j];
+            float norm_val = (val - mean) / sqrt(variance + EPSILON);
+            norm.data[i * x.cols + j] = norm_val;
+        }
+    }
     return norm;
     
 }
@@ -66,6 +85,9 @@ matrix delta_mean(matrix d, matrix variance, int spatial)
 {
     matrix dm = make_matrix(1, variance.cols);
     // TODO: 7.3 - calculate dL/dmean
+    // for (int i = 0; i < dm.cols; i++) {
+    //     dm.data[i] = d.data[]
+    // }
     return dm;
 }
 
