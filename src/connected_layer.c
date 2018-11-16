@@ -53,6 +53,10 @@ matrix forward_connected_layer(layer l, matrix in)
     l.out[0] = out;
     free_matrix(l.delta[0]);
     l.delta[0] = make_matrix(out.rows, out.cols);
+    if(l.batchnorm){
+        matrix xnorm = batch_normalize_forward(l, out);
+        out = xnorm;
+    }
     return out;
 }
 
@@ -119,6 +123,9 @@ layer make_connected_layer(int inputs, int outputs, ACTIVATION activation)
     l.forward  = forward_connected_layer;
     l.backward = backward_connected_layer;
     l.update   = update_connected_layer;
+    l.x = calloc(1, sizeof(matrix));
+    l.rolling_mean = make_matrix(1, outputs);
+    l.rolling_variance = make_matrix(1, outputs);
     return l;
 }
 

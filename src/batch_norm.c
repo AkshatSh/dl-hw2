@@ -85,9 +85,16 @@ matrix delta_mean(matrix d, matrix variance, int spatial)
 {
     matrix dm = make_matrix(1, variance.cols);
     // TODO: 7.3 - calculate dL/dmean
-    // for (int i = 0; i < dm.cols; i++) {
-    //     dm.data[i] = d.data[]
-    // }
+    int i, j;
+    for(i = 0; i < d.rows; ++i){
+        for(j = 0; j < d.cols; ++j){
+            float val = d.data[i*d.cols + j];
+            float variance_term = variance.data[j/spatial];
+
+            dm.data[j/spatial] += (val * -1.0/ sqrt(variance_term+ EPSILON) );
+        }
+    }
+
     return dm;
 }
 
@@ -95,6 +102,18 @@ matrix delta_variance(matrix d, matrix x, matrix mean, matrix variance, int spat
 {
     matrix dv = make_matrix(1, variance.cols);
     // TODO: 7.4 - calculate dL/dvariance
+    int i,j;
+    for(i = 0; i < d.rows; ++i){
+        for(j = 0; j < d.cols; ++j){
+            float dx_val = d.data[i*d.cols + j];
+            float x_val = x.data[i*x.cols + j];
+            float mean_val = mean.data[j / spatial];
+            
+            float variance_val = variance.data[j/spatial];
+
+            dv.data[j/spatial] += dx_val * (x_val - mean_val)* (-1.0 / 2.0 ) * pow(variance_val + EPSILON, -3.0/2.0);
+        }
+    }
     return dv;
 }
 
@@ -103,6 +122,25 @@ matrix delta_batch_norm(matrix d, matrix dm, matrix dv, matrix mean, matrix vari
     int i, j;
     matrix dx = make_matrix(d.rows, d.cols);
     // TODO: 7.5 - calculate dL/dx
+    for(i = 0; i < dx.rows; ++i){
+        for(j = 0; j < dx.cols; ++j){
+            float dx_val = d.data[i*d.cols + j];
+            float x_val = x.data[i*x.cols + j];
+            float mean_val = mean.data[j / spatial];
+            float dm_val = dm.data[j / spatial];
+            float dv_val = dv.data[j / spatial];
+            float m = dx.cols / spatial;
+            
+            float variance_val = variance.data[j/spatial];
+
+            dx.data[i * dx.cols + j] = (
+                dx_val *
+                (1.0 / (sqrt(variance_val + EPSILON))) +
+                2.0 * (x_val - mean_val) / (m) * dv_val +
+                dm_val / (m) 
+            );
+        }
+    }
     return dx;
 }
 
