@@ -175,6 +175,12 @@ void backward_convolutional_layer(layer l, matrix prev_delta)
     int outw = (l.width-1)/l.stride + 1;
     int outh = (l.height-1)/l.stride + 1;
 
+    if(l.batchnorm){
+        matrix dx = batch_normalize_backward(l, delta);
+        free_matrix(delta);
+        l.delta[0] = delta = dx;
+    }
+
     gradient_matrix(out, l.activation, delta);
     backward_convolutional_bias(delta, l.db);
     int i;
@@ -203,12 +209,6 @@ void backward_convolutional_layer(layer l, matrix prev_delta)
         free_matrix(dw);
     }
     free_matrix(wt);
-
-    if(l.batchnorm){
-        matrix dx = batch_normalize_backward(l, delta);
-        free_matrix(delta);
-        l.delta[0] = delta = dx;
-    }
 }
 
 // Update convolutional layer

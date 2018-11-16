@@ -69,6 +69,12 @@ void backward_connected_layer(layer l, matrix prev_delta)
     matrix out   = l.out[0];
     matrix delta = l.delta[0];
 
+    if(l.batchnorm){
+        matrix dx = batch_normalize_backward(l, delta);
+        free_matrix(delta);
+        l.delta[0] = delta = dx;
+    }
+
     // TODO: 3.2
     // delta is the error made by this layer, dL/dout
     // First modify in place to be dL/d(in*w+b) using the gradient of activation

@@ -1,7 +1,7 @@
 from uwnet import *
 
 def conv_net():
-    l = [   make_convolutional_layer(32, 32, 3, 8, 3, 1, LRELU),
+    l = [   make_convolutional_layer(32, 32, 3, 8, 3, 1, LRELU, 1),
             make_maxpool_layer(32, 32, 8, 3, 2),
             make_convolutional_layer(16, 16, 8, 16, 3, 1, LRELU),
             make_maxpool_layer(16, 16, 16, 3, 2),
