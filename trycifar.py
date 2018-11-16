@@ -21,7 +21,7 @@ print
 print("making model...")
 batch = 128
 iters = 5000
-rate = 1 # (0.01) => 65 test (0.001) => 59 test (0.1) => 0.67
+rate = 0.1 # (0.01) => 65 test (0.001) => 59 test (0.1) => 0.67 (1) => nan
 momentum = .9
 decay = .005
 
