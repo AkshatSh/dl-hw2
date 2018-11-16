@@ -71,10 +71,10 @@ matrix batch_normalize_forward(layer l, matrix x)
     scal_matrix(1-s, l.rolling_variance);
     axpy_matrix(s, v, l.rolling_variance);
 
-    // free_matrix(m);
-    // free_matrix(v);
+    free_matrix(m);
+    free_matrix(v);
 
-    // free_matrix(l.x[0]);
+    free_matrix(l.x[0]);
     l.x[0] = x;
 
     return x_norm;
@@ -129,7 +129,7 @@ matrix delta_batch_norm(matrix d, matrix dm, matrix dv, matrix mean, matrix vari
             float mean_val = mean.data[j / spatial];
             float dm_val = dm.data[j / spatial];
             float dv_val = dv.data[j / spatial];
-            float m = dx.cols / spatial;
+            float m = dx.rows * spatial;
             
             float variance_val = variance.data[j/spatial];
 

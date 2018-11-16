@@ -42,8 +42,14 @@ matrix forward_connected_layer(layer l, matrix in)
     matrix w = l.w;
 
     matrix out = matmul(in, w);
-    forward_bias(out, l.b);
 
+    if(l.batchnorm){
+        matrix xnorm = batch_normalize_forward(l, out);
+        out = xnorm;
+    }
+
+    forward_bias(out, l.b);
+    
     activate_matrix(out, l.activation);
 
     // Saving our input and output and making a new delta matrix to hold errors
@@ -53,10 +59,6 @@ matrix forward_connected_layer(layer l, matrix in)
     l.out[0] = out;
     free_matrix(l.delta[0]);
     l.delta[0] = make_matrix(out.rows, out.cols);
-    if(l.batchnorm){
-        matrix xnorm = batch_normalize_forward(l, out);
-        out = xnorm;
-    }
     return out;
 }
 
@@ -69,12 +71,6 @@ void backward_connected_layer(layer l, matrix prev_delta)
     matrix out   = l.out[0];
     matrix delta = l.delta[0];
 
-    if(l.batchnorm){
-        matrix dx = batch_normalize_backward(l, delta);
-        free_matrix(delta);
-        l.delta[0] = delta = dx;
-    }
-
     // TODO: 3.2
     // delta is the error made by this layer, dL/dout
     // First modify in place to be dL/d(in*w+b) using the gradient of activation
@@ -83,6 +79,12 @@ void backward_connected_layer(layer l, matrix prev_delta)
     // Calculate the updates for the bias terms using backward_bias
     // The current bias deltas are stored in l.db
     backward_bias(delta, l.db);
+
+    if(l.batchnorm){
+        matrix dx = batch_normalize_backward(l, delta);
+        free_matrix(delta);
+        l.delta[0] = delta = dx;
+    }
 
     // Then calculate dL/dw. Use axpy to add this dL/dw into any previously stored
     // updates for our weights, which are stored in l.dw
