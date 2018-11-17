@@ -40,6 +40,17 @@ print("test accuracy:     %f", accuracy_net(m, test))
 # Your answer:
 #
 
+'''
+The conv net performs around 10% better. The conv net had a test accuracy of about 60%, where as the
+feed forward network performs at about 50% accuracy on the test set.
+
+I think the convnet performs better than a feedforward network is because the network design is able to capture spatial features by design which seems relevant to how people view images as well.
+'''
+
+'''
+The highest accuracy I got 67.5 % on test with batch norm
+'''
+
 # 8*27*1024 + 16*72*256 + 32*144*64 + 64*288*16 + 256*10
 # 1108480
 # 221696
